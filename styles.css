@@ -1,0 +1,92 @@
+/* Custom styles */
+.drop-zone {
+    transition: all 0.3s ease;
+}
+
+.drop-zone.active {
+    border-color: #4F46E5;
+    background-color: #EEF2FF;
+}
+
+.pdf-item {
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.pdf-item.dragging {
+    opacity: 0.5;
+    background-color: #E0E7FF;
+}
+
+.pdf-item:hover {
+    transform: translateY(-2px);
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Navbar shadow on scroll */
+.navbar-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Mobile menu animation */
+#mobile-menu {
+    transition: all 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+}
+
+#mobile-menu.open {
+    max-height: 200px;
+}
+
+/* Active nav link */
+.active-nav-link {
+    color: #4F46E5 !important;
+    border-color: #4F46E5 !important;
+}
+a, span,p {
+  font-family: "Quicksand", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
+}
+h1   {
+    background: linear-gradient(to right, #3586ff, #eb7543);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: 80px;
+  font-weight: bold;
+}
+h2 {
+    background: linear-gradient(to right, #ff5e5e, #2457ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: 40px;
+  font-weight: normal;
+}
+
+#head {
+    background: linear-gradient(to right, #44c7ff, #f83131);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: 30px;
+  font-weight: normal;
+}
+
+.main:hover {
+  animation: slideUp 0.5s forwards;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(1%); }
+  to { transform: translateY(-4%); }
+}
