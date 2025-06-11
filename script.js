@@ -139,28 +139,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleFiles(e) {
         const files = e.target.files;
+        let newFilesAdded = false;
         
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             
             // Check if file is PDF
-            if (file.type === 'application/pdf') {
+            if (file.type === "application/pdf") {
                 // Check if file is already added
                 if (!pdfFiles.some(f => f.name === file.name && f.size === file.size)) {
                     pdfFiles.push(file);
+                    newFilesAdded = true;
                 }
             }
         }
         
-        renderPdfList();
-        updateMergeButton();
-        
-        // Auto-scroll to PDF list after upload
-        if (pdfFiles.length > 0) {
+        if (newFilesAdded) {
+            renderPdfList();
+            updateMergeButton();
+            
+            // Smooth scroll to the uploaded files section with a slight delay
             setTimeout(() => {
-                pdfListContainer.scrollIntoView({ behavior: 'smooth' });
+                pdfListContainer.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                // Highlight the newly added PDF files temporarily
+                highlightNewFiles();
             }, 300);
         }
+    }
+
+    function highlightNewFiles() {
+        const pdfItems = document.querySelectorAll('.pdf-item');
+        pdfItems.forEach(item => {
+            item.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
+            
+            // Remove highlight after 2 seconds
+            setTimeout(() => {
+                item.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
+            }, 2000);
+        });
     }
 
     function renderPdfList() {
@@ -174,9 +194,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         pdfFiles.forEach((file, index) => {
             const pdfItem = document.createElement('div');
-            pdfItem.className = 'pdf-item bg-white p-4 rounded-lg shadow flex items-center justify-between w-full';
+            pdfItem.className = 'pdf-item bg-white p-4 rounded-lg shadow flex items-center justify-between w-full transition-all duration-200 hover:shadow-md';
             pdfItem.draggable = true;
             pdfItem.dataset.index = index;
+            
+            // Format the filename to show extension and truncate if too long
+            const fileName = file.name.length > 30 
+                ? `${file.name.substring(0, 25)}...${file.name.split('.').pop()}` 
+                : file.name;
             
             pdfItem.innerHTML = `
                 <div class="flex items-center w-full min-w-0">
@@ -190,8 +215,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
-                        <p class="text-xs text-gray-500 mt-1">${formatFileSize(file.size)}</p>
+                        <p class="text-sm font-medium text-gray-900 truncate" title="${file.name}">${fileName}</p>
+                        <div class="flex items-center mt-1">
+                            <span class="text-xs text-gray-500">${formatFileSize(file.size)}</span>
+                            <span class="mx-2 text-gray-300">•</span>
+                            <span class="text-xs font-mono text-gray-400">.${file.name.split('.').pop()}</span>
+                        </div>
                     </div>
                 </div>
                 <button class="remove-btn text-red-500 hover:text-red-700 flex-shrink-0 ml-3">
@@ -221,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add warning message if only one PDF is uploaded
         if (pdfFiles.length === 1) {
             const warningMessage = document.createElement('div');
-            warningMessage.className = 'mt-4 text-center text-red-500 font-medium warning-message';
+            warningMessage.className = 'mt-4 text-center text-red-500 md:text-2xl font-medium warning-message';
             warningMessage.textContent = 'At least 2 PDFs should be uploaded for merging';
             pdfList.appendChild(warningMessage);
         }
