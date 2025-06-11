@@ -174,21 +174,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         pdfFiles.forEach((file, index) => {
             const pdfItem = document.createElement('div');
-            pdfItem.className = 'pdf-item bg-white p-4 rounded-lg shadow flex items-center justify-between';
+            pdfItem.className = 'pdf-item bg-white p-4 rounded-lg shadow flex items-center justify-between w-full';
             pdfItem.draggable = true;
             pdfItem.dataset.index = index;
             
             pdfItem.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="h-8 w-8 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                    <div>
-                        <p class="text-sm font-medium text-gray-900 truncate max-w-xs">${file.name}</p>
-                        <p class="text-xs text-gray-500">${formatFileSize(file.size)}</p>
+                <div class="flex items-center w-full min-w-0">
+                    <div class="pdf-icon-container mr-3 flex-shrink-0">
+                        <svg class="h-10 w-10 text-red-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                        <p class="text-xs text-gray-500 mt-1">${formatFileSize(file.size)}</p>
                     </div>
                 </div>
-                <button class="remove-btn text-red-500 hover:text-red-700">
+                <button class="remove-btn text-red-500 hover:text-red-700 flex-shrink-0 ml-3">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
@@ -211,6 +217,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateMergeButton();
             });
         });
+        
+        // Add warning message if only one PDF is uploaded
+        if (pdfFiles.length === 1) {
+            const warningMessage = document.createElement('div');
+            warningMessage.className = 'mt-4 text-center text-red-500 font-medium warning-message';
+            warningMessage.textContent = 'At least 2 PDFs should be uploaded for merging';
+            pdfList.appendChild(warningMessage);
+        }
     }
 
     // Drag and drop functions for reordering
@@ -255,7 +269,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateMergeButton() {
-        mergeBtn.disabled = pdfFiles.length === 0;
+        // Disable button if less than 2 PDFs are uploaded
+        mergeBtn.disabled = pdfFiles.length < 2;
+        
+        // Update button text if only one PDF is uploaded
+        if (pdfFiles.length === 1) {
+            mergeBtn.innerHTML = `
+                Merge & Download PDF
+                <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+            `;
+        }
     }
 
     function formatFileSize(bytes) {
@@ -268,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Merge button functionality
     mergeBtn.addEventListener('click', async function() {
-        if (pdfFiles.length === 0) return;
+        if (pdfFiles.length < 2) return;
         
         this.disabled = true;
         this.innerHTML = `
