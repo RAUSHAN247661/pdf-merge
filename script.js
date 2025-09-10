@@ -1,12 +1,46 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
+    // Mobile sidebar toggle and overlay
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
-    
-    mobileMenuButton.addEventListener('click', function() {
-        mobileMenu.classList.toggle('open');
-        mobileMenu.classList.toggle('hidden');
-        this.setAttribute('aria-expanded', mobileMenu.classList.contains('open'));
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+
+    function openSidebar() {
+        mobileMenu.classList.add('open');
+        sidebarOverlay.classList.add('open');
+        document.body.classList.add('overflow-hidden');
+    }
+    function closeSidebar() {
+        mobileMenu.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    mobileMenuButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openSidebar();
+        this.setAttribute('aria-expanded', 'true');
+    });
+
+    closeSidebarBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeSidebar();
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+    });
+
+    sidebarOverlay.addEventListener('click', function() {
+        closeSidebar();
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+    });
+
+    // Hide sidebar when clicking outside (on body)
+    document.addEventListener('click', function(e) {
+        if (mobileMenu.classList.contains('open')) {
+            if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target) && !sidebarOverlay.contains(e.target)) {
+                closeSidebar();
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            }
+        }
     });
 
     // Smooth scrolling for navigation links
@@ -15,19 +49,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
-            
             // Close mobile menu if open
             if (mobileMenu.classList.contains('open')) {
-                mobileMenu.classList.remove('open');
-                mobileMenu.classList.add('hidden');
+                closeSidebar();
                 mobileMenuButton.setAttribute('aria-expanded', 'false');
             }
-            
             // Smooth scroll to target
             targetElement.scrollIntoView({
                 behavior: 'smooth'
             });
-            
             // Update active nav link
             updateActiveNavLink(targetId);
         });
